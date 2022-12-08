@@ -1,0 +1,221 @@
+{% extends 'layouts/index.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#tambahBuku" style="color: white;"><i class="fa-solid fa-plus"></i> Tambah Buku</a>
+        <a href="{% url 'exportBook' %}" class="btn btn-primary" style="color: white;"><i class="fa-solid fa-file-excel"></i> Excel</a>
+        <a href="#" class="btn btn-outline-secondary"><i class="fa-solid fa-print"></i> Print</a>
+        <a href="#" class="btn btn-outline-warning" onclick="ReloadPage()" style="float: right;"><i class="fa-solid fa-rotate"></i> Reload Table</a>
+    </div>
+    <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+        <div class="card-body">
+            <div class="table-responsive" id="rld">
+                {% for row in messages %}
+                    {% if row.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <div>{{ row }}</div>
+                            <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <div>{{ row }}</div>
+                            <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <table class="table table-bordered text-center" id="book-table">
+                    <thead class="bg-warning">
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Gambar</th>
+                            <th class="text-center">Judul</th>
+                            <th class="text-center">Penulis</th>
+                            <th class="text-center">Penerbit</th>
+                            <th class="text-center">Kelompok Buku</th>
+                            <th class="text-center">Tanggal Masuk Buku</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr id="{{ row.id }}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% if row.image %} 
+                                        <img src="{{ row.image.url }}" alt="buku" width="50px" class="img-thumbnail">
+                                    {% endif %}
+                                </td>
+                                <td>{{ row.judul }}</td>
+                                <td>{{ row.penulis }}</td>
+                                <td>{{ row.penerbit }}</td>
+                                <td>{{ row.kelompok_id }}</td>
+                                <td>{{ row.tgl_upload }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-primary dropdown-toggle text-white btn-sm" data-bs-toggle="dropdown">
+                                            Pilih
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'showbook' row.id %}">Lihat</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="deleteBook()">Hapus</a></li>
+                                            <li><a href="{{ row.file.url }}" download="" class="dropdown-item">Download</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="tambahBuku" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tambahBukuLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Tambah Buku</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="#" enctype="multipart/form-data" method="post" id="form-book" novalidate>
+            {% csrf_token %}
+              <div class="form-group mb-3">
+                {{form.as_p}}
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Kirim</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block script %}
+<script>
+     $(document).ready( function () {
+        var table = $('#book-table').DataTable();
+    });
+
+    $('#form-book').submit(function (e) {
+        e.preventDefault();
+        $form = $(this)
+        var formData = new FormData(this);
+        $.ajax({
+            url: "{% url 'storeBook' %}",
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                $('.error').remove();
+                // console.log(response);
+
+                if (response.error) {
+                    $.each(response.errors, function(name, error) {
+                        // error = '<p class="text-danger">'+ error +'</p>'
+                        error = alertify.set('notifier','position', 'top-right');
+                                alertify.error('Kolom ' + name +' harus di isi');
+                        $form.find('[name='+ name +']').after(error)
+                    })
+                } else {
+                    alertify.set('notifier','position', 'top-right');
+                    alertify.success(response.message);
+                    $('.modal').each(function(){
+                        $(this).modal('hide');
+                    });
+                    // $('#book-table').load(location.href + ' #book-table');
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+    function ReloadPage() {
+        window.location = '/databuku'
+    }
+
+    function deleteBook() {
+        custom_alert();
+    }
+
+function custom_alert(alert_message) {
+
+/* You can utilize the web page address
+ * for the alert message by doing the following:
+
+ const ALERT_TITLE = "The page at " + document.location.href + " says: ";
+ */
+const ALERT_TITLE = "Alert Message";
+const ALERT_BUTTON_TEXT = "OK";
+
+// Check if there is an HTML element with
+// an ID of "alert_container".If true, abort
+// the creation of the custom alert.
+let is_alert_container_exist = document.getElementById("alert_container");
+    if (is_alert_container_exist) {
+        return;
+    }
+
+    // Create a div to serve as the alert
+    // container. Afterward, attach it to the body
+    // element.
+    let get_body_element = document.querySelector("body");
+    let div_for_alert_container = document.createElement("div");
+    let alert_container = get_body_element.appendChild(div_for_alert_container);
+
+    // Add an HTML ID and a class name for the
+    // alert container
+    alert_container.id = "alert_container";
+    alert_container.className = "alert_container"
+
+    // Create the div for the alert_box and attach
+    // it to the alert container.
+    let div_for_alert_box = document.createElement("div")
+    let alert_box = alert_container.appendChild(div_for_alert_box);
+    alert_box.className = "alert_box";
+
+    // Set the position of the alert box using
+    // scrollTop, scrollWidth, and offsetWidth
+    alert_box.style.top = document.documentElement.scrollTop + "px";
+    alert_box.style.left = (document.documentElement.scrollWidth - alert_box.offsetWidth) / 2 + "px";
+
+    // Create h1 to hold the alert title
+    let alert_header_tag = document.createElement("h1");
+    let alert_title_text = document.createTextNode(ALERT_TITLE)
+    let alert_title= alert_box.appendChild(alert_header_tag);
+    alert_title.appendChild(alert_title_text);
+
+    // Create a paragraph element to hold the
+    // alert message
+    let alert_paragraph_tag = document.createElement("p");
+    let alert_message_container = alert_box.appendChild(alert_paragraph_tag);
+    alert_message_container.textContent = alert_message;
+
+    // Create the OK button
+    let ok_button_tag = document.createElement("button");
+    let ok_button_text = document.createTextNode(ALERT_BUTTON_TEXT)
+    let ok_button = alert_box.appendChild(ok_button_tag);
+    ok_button.className = "close_btn";
+    ok_button.appendChild(ok_button_text);
+
+    // Add an event listener that'll close the
+    // custom alert
+    ok_button.addEventListener("click", function () {
+        remove_custom_alert();
+    }, false);
+}
+
+function remove_custom_alert() {
+    let HTML_body = document.querySelector("body");
+    let alert_container = document.getElementById("alert_container");
+    HTML_body.removeChild(alert_container);
+}
+</script>
+{% endblock script %}

@@ -1,0 +1,278 @@
+{% extends 'layouts/index.html' %}
+
+{% block content %}
+<div class="col-auto mb-3">
+    <div class="page-utilities">
+       <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
+           <div class="col-auto">						    
+               <a class="btn btn-outline-warning " onclick="ReloadTable()" href="#"><i class="fa-solid fa-refresh"></i> Refresh Table</a>
+               <a class="btn btn-info text-white" href="#" data-bs-toggle="modal" data-bs-target="#storeGuru"><i class="fa-solid fa-plus"></i> Tambah Guru</a>
+               <a class="btn app-btn-primary" href="{% url 'exprtGuru' %}"><i class="fa-solid fa-file-excel"></i> Excel</a>
+               <a class="btn app-btn-secondary" href="{% url 'printGuru' %}" id="printGuru"><i class="fa-solid fa-print"></i> Print</a>
+           </div>
+       </div><!--//row-->
+   </div><!--//table-utilities-->
+</div><!--//col-auto-->
+
+<nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
+    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">All</a>
+    <a class="flex-sm-fill text-sm-center nav-link"  id="orders-paid-tab" data-bs-toggle="tab" href="#orders-paid" role="tab" aria-controls="orders-paid" aria-selected="false">PNS</a>
+    <a class="flex-sm-fill text-sm-center nav-link" id="orders-pending-tab" data-bs-toggle="tab" href="#orders-pending" role="tab" aria-controls="orders-pending" aria-selected="false">PPPK</a>
+    <a class="flex-sm-fill text-sm-center nav-link" id="orders-cancelled-tab" data-bs-toggle="tab" href="#orders-cancelled" role="tab" aria-controls="orders-cancelled" aria-selected="false">Honor</a>
+</nav>
+
+<div class="tab-content" id="orders-table-tab-content">
+    <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+        <div class="card card-orders-table shadow-sm mb-5">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered app-table-hover mb-0 text-center"  id="table-guru">
+                        <thead  class="bg-secondary text-white">
+                            <tr>
+                                <th class="cell">No</th>
+                                <th class="cell">Nama Lengkap</th>
+                                <th class="cell">Nuptk</th>
+                                <th class="cell">Jabatan</th>
+                                <th class="cell">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                                <tr>
+                                    <td class="cell">{{ forloop.counter }}</td>
+                                    <td class="cell"><span class="truncate">{{row.full_name}}</span></td>
+                                    <td class="cell">{{row.username}}</td>
+                                    {% if row.jabatan == 'PNS' %}
+                                        <td class="cell"><span class="badge bg-primary">{{row.jabatan}}</span><span class="note"></span></td>
+                                    {% elif row.jabatan == 'PPPK' %}
+                                        <td class="cell"><span class="badge bg-warning">{{row.jabatan}}</span><span class="note"></span></td>
+                                    {% elif row.jabatan == 'Honor' %}
+                                        <td class="cell"><span class="badge bg-danger">{{row.jabatan}}</span><span class="note"></span></td>
+                                    {% endif %}
+                                    <td class="cell">
+                                        <a class="btn-sm btn-secondary" href="{% url 'showGuru' row.id %}"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+            </div><!--//app-card-body-->		
+        </div><!--//app-card-->
+    </div><!--//tab-pane-->
+    
+    <div class="tab-pane fade" id="orders-paid" role="tabpanel" aria-labelledby="orders-paid-tab">
+        <div class="card card-orders-table mb-5">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered  app-table-hover mb-0 text-center"  id="table-guru-pns">
+                        <thead  class="bg-success text-white">
+                            <tr>
+                                <th class="cell">No</th>
+                                <th class="cell">Nama Lengkap</th>
+                                <th class="cell">NIP</th>
+                                <th class="cell">Nuptk</th>
+                                <th class="cell">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data_pns %}
+                                <tr>
+                                    <td class="cell">{{ forloop.counter }}</td>
+                                    <td class="cell"><span class="truncate">{{row.full_name}}</span></td>
+                                    <td class="cell">{{row.username}}</td>
+                                    <td class="cell"><span class="badge bg-success">{{row.jabatan}}</span><span class="note"></span></td>
+                                    <td class="cell">
+                                        <a class="btn-sm btn-secondary" href="{% url 'showGuru' row.id %}"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+            </div><!--//app-card-body-->		
+        </div><!--//app-card-->
+    </div><!--//tab-pane-->
+    
+    <div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
+        <div class="card card-orders-table mb-5">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered  app-table-hover mb-0 text-center"  id="table-guru-pppk">
+                        <thead  class="bg-warning text-white">
+                            <tr>
+                                <th class="cell">No</th>
+                                <th class="cell">Nama Lengkap</th>
+                                <th class="cell">Nuptk</th>
+                                <th class="cell">Jabatan</th>
+                                <th class="cell">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data_pppk %}
+                                <tr>
+                                    <td class="cell">{{ forloop.counter }}</td>
+                                    <td class="cell"><span class="truncate">{{row.full_name}}</span></td>
+                                    <td class="cell">{{row.username}}</td>
+                                    <td class="cell"><span class="badge bg-warning">{{row.jabatan}}</span><span class="note"></span></td>
+                                    <td class="cell">
+                                        <a class="btn-sm btn-secondary" href="{% url 'showGuru' row.id %}"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+            </div><!--//app-card-body-->		
+        </div><!--//app-card-->
+    </div><!--//tab-pane-->
+    <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
+        <div class="card card-orders-table mb-5">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered  app-table-hover mb-0 text-center" id="table-guru-honor">
+                        <thead class="bg-danger text-white" >
+                            <tr>
+                                <th class="cell">No</th>
+                                <th class="cell">Nama Lengkap</th>
+                                <th class="cell">Nuptk</th>
+                                <th class="cell">Jabatan</th>
+                                <th class="cell">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data_honor %}
+                                <tr>
+                                    <td class="cell">{{ forloop.counter }}</td>
+                                    <td class="cell"><span class="truncate">{{row.full_name}}</span></td>
+                                    <td class="cell">{{row.username}}</td>
+                                    <td class="cell"><span class="badge bg-danger">{{row.jabatan}}</span><span class="note"></span></td>
+                                    <td class="cell">
+                                        <a class="btn-sm btn-secondary" href="{% url 'showGuru' row.id %}"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+            </div><!--//app-card-body-->		
+        </div><!--//app-card-->
+    </div><!--//tab-pane-->
+</div><!--//tab-content-->
+
+
+<div class="modal fade" id="storeGuru" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="storeGuruLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="storeGuruLabel">Tambah Guru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="#" method="post" id="guru-form" novalidate>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="">Nuptk</label>
+                {{form.username}}
+            </div>
+            <div class="form-group mb-3">
+                <label for="">Nama Lengkap</label>
+                {{form.full_name}}
+            </div>
+            <div class="form-group mb-3">
+                <label for="">Email</label>
+                {{form.email}}
+            </div>
+            <div class="form-group mb-3">
+                <label for="">Password</label>
+                {{form.password1}}
+            </div>
+            <div class="form-group mb-3">
+                <label for="">Repeat Password</label>
+                {{form.password2}}
+            </div>
+            <div class="form-group mb-3">
+                <input type="hidden" name="kelas_id" value="7">
+            </div>
+            <div class="form-group mb-3">
+                <input type="hidden" name="role" value="admin">
+            </div>
+            <div class="form-group mb-3">
+                <select name="jabatan" id="#" class="form-select">
+                    <option>-- Pilih --</option>
+                    <option value="PNS">PNS</option>
+                    <option value="PPPK">PPPK</option>
+                    <option value="Honor">Honor</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Kirim</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('#table-guru').DataTable();
+        $('#table-guru-pns').DataTable();
+        $('#table-guru-pppk').DataTable();
+        $('#table-guru-honor').DataTable();
+    });
+
+    $('#printGuru').on('click', function(e) {
+        e.preventDefault();
+
+        $source = $(this).attr('href');
+
+        win = window.open($source,"_blank");
+              win.onload = function() { win.print(); 
+              win.onfocus=function() { win.close(); }
+            }
+    });
+
+    $('#guru-form').submit(function (e) {
+        e.preventDefault();
+        $form = $(this)
+        var formData = new FormData(this);
+        $.ajax({
+            url: "{% url 'storeGuru' %}",
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                $('.error').remove();
+                // console.log(response);
+                
+                if (response.error) {
+                    $.each(response.errors, function(name, error) {
+                        // error = '<p class="text-danger">'+ error +'</p>'
+                        error = alertify.set('notifier','position', 'top-right');
+                                alertify.error('Kolom ' + name +' harus di isi');
+                        $form.find('[name='+ name +']').after(error)
+                    })
+                } else {
+                    alertify.set('notifier','position', 'top-right');
+                    alertify.success(response.message);
+                    $('.modal').each(function(){
+                        $(this).modal('hide');
+                    });
+                    // $('#book-table').load(location.href + ' #book-table');
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+    });
+
+    function ReloadTable() {
+        url = '/dataguru';
+        window.location = url
+    }
+</script>
+{% endblock script %}

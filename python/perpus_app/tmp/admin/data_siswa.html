@@ -1,0 +1,148 @@
+{% extends 'layouts/index.html' %}
+
+{% block content %}
+<div class="tab-content" id="orders-table-tab-content">
+    <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+        <div class="card card-orders-table shadow-sm mb-5">
+            <div class="card-header">
+                <a href="#" class="btn btn-info" style="color: white;" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="fa-solid fa-plus"></i> Tambah Siswa</a>
+                <a href="{% url 'exprtU' %}" class="btn btn-primary" style="color: white;"><i class="fa-solid fa-file-excel"></i> Excel</a>
+                <a href="{% url 'print' %}" id="print" class="btn btn-outline-secondary"><i class="fa-solid fa-print"></i> Print</a>
+                <a href="#" class="btn btn-primary float-right" style="color: white; float: right;" data-bs-toggle="modal" data-bs-target="#kelasBackdrop"><i class="fa-solid fa-plus"></i> Tambah Kelas</a>
+            </div>
+            <div class="card-body">
+                {% for row in messages %}
+                    {% if row.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <div>{{ row }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <div>{{ row }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped text-center" id="siswa-table" >
+                        <thead class="bg-secondary" style="color: white;">
+                            <tr>
+                                <th class="cell text-center">No</th>
+                                <th class="cell text-center">Nisn</th>
+                                <th class="cell text-center">Nama Siswa</th>
+                                <th class="cell text-center">Kelas</th>
+                                <th class="cell text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                                <tr>
+                                    <td class="cell">{{ forloop.counter }}</td>
+                                    <td class="cell"><span class="truncate">{{ row.username }}</span></td>
+                                    <td class="cell">{{row.full_name}}</td>
+                                    <td class="cell">{{row.kelas_id}}</td>
+                                    <td class="cell"><a class="btn-sm btn-secondary" href="{% url 'show_siswa' row.id %}">Lihat</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!--//table-responsive-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Tambah User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {{form.error}}
+            <form action="{% url 'strS' %}" method="post" novalidate>
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="#">NISN</label>
+                    {{ form.username }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="#">Nama Lengkap</label>
+                    {{ form.full_name }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="#">Email</label>
+                    {{ form.email }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="#">Password</label>
+                    {{ form.password1 }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="#">Repeat Password</label>
+                    {{ form.password2 }}
+                </div>
+                <!-- <div class="form-group mb-3">
+                    <select name="role" id="" class="form-select">
+                        <option>-- Pilih Role User --</option>
+                        <option value="admin">Admin</option>
+                        <option value="siswa">Siswa</option>
+                    </select>
+                </div> -->
+                <input type="hidden" value="siswa" name="role" readonly>
+                <div class="form-group mb-3">
+                    <label for="#">Kelas</label>
+                    {{ form.kelas_id }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="color: white;">Kirim</button>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="kelasBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="kelasBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="kelasBackdropLabel">Tambah Kelas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'strK' %}" method="post">
+                {% csrf_token %}
+                {{form_kelas.as_p}}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="color: white;">Kirim</button>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready( function () {
+        $('#siswa-table').DataTable();
+    });
+
+    $('#print').on('click', function(e) {
+        e.preventDefault();
+
+        $source = $(this).attr('href');
+
+        win = window.open($source,"_blank");
+              win.onload = function() { win.print(); 
+              win.onfocus=function() { win.close(); }
+            }
+    });
+</script>
+{% endblock script %}

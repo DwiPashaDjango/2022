@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "jn-jairo/laravel-ngrok": "^2.0"
+    }
+}

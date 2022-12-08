@@ -1,0 +1,33 @@
+{% extends 'layouts/petugas.html' %}
+
+{% block content %}
+<div class="">
+    <div class="col-lg">
+        <div class="card-header">
+            <ul class="nav nav-pills mb-3 d-flex justify-content-center" id="pills-tab" role="tablist">
+                <li class="nav-item text-center" role="presentation">
+                    <button class="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Laporan Data Siswa</button>
+                </li>
+                <li class="nav-item text-center" role="presentation">
+                    <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Laporan Data Buku</button>
+                </li>
+                <li class="nav-item text-center" role="presentation">
+                    <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Laporan Data Peminjam</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">Laporan Siswa</div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                        <a href="{% url 'laporan.excel' %}" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel</a>
+                        <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</a>
+                    </div>
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">Laporan Peminjaman</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

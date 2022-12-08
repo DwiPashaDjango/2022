@@ -1,0 +1,61 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Data Siswa {% endblock %}
+
+{% block content %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <a href="#" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah Siswa</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped text-center" id="guru-table">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Nama</th>
+                            <th>JK</th>
+                            <th>Tanggal Lahir</th>
+                            <th>Tempat Lahir</th>
+                            <th>NUPTK</th>
+                            <th>NIK</th>
+                            <th>NIP</th>
+                            <th>Created_at</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    var url = 'http://localhost:3000/api/guru';
+
+    $(document).ready(function() {
+        $('#guru-table').DataTable({
+            "processing": true,
+            "sPaginationType": "full_numbers",
+            "ajax": {
+                "url": "http://localhost:3000/api/guru",
+                "type": 'GET',
+                "dataType": 'json'
+            },
+            "columns": [
+                { "data": "nama_guru" },
+                { "data": "jk" },
+                { "data": "tgl_lahir" },
+                { "data": "tempat_lahir" },
+                { "data": "nuptk" },
+                { "data": "nik" },
+                { "data": "nip" },
+                { "data": "createdAt" },
+            ]
+        });
+    });
+
+
+</script>
+{% endblock scripts %}

@@ -1,0 +1,83 @@
+{% extends 'layouts/index.html' %}
+
+{% block content %}
+<div class="main-body">
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="main-breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Perpustakaan Digital</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{jdl}}</li>
+      </ol>
+    </nav>
+    <!-- /Breadcrumb -->
+
+    <div class="row gutters-sm">
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-column align-items-center text-center">
+              <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+              <div class="mt-3">
+                <h4>{{data.full_name}}</h4>
+                <p class="text-secondary mb-1">{{data.username}}</p>
+                <p class="text-muted font-size-sm">{{data.kelas_id}}</p>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-danger" style="color: white;"><i class="fa-solid fa-trash"></i> Hapus</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">NISN</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{data.username}}
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Nama Lengkap</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{data.full_name}}
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Kelas</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{data.kelas_id}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">{{data.full_name}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Anda Yakin Ingin Menghapus {{data.full_name}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <a href="{% url 'dltS' data.id %}" class="btn btn-danger" style="color: white;"><i class="fa-solid fa-trash"></i> Hapus</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,159 @@
+{% extends 'layouts/petugas.html' %}
+
+{% block content %}
+<div class="col-lg">
+    <div class="card mb-4">
+        <div class="card-header pb-0">
+          <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahBuku">Tambah Buku</a>
+          <a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#regBook">Registrasi Buku</a>
+        </div>
+        <div class="card-body">
+          {% for row in messages %}
+              {% if row.tags == 'success' %}
+                  <div class="alert alert-success alert-dismissible" role="alert">
+                      <div>{{row}}</div>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% else %}
+                  <div class="alert alert-danger alert-dismissible" role="alert">
+                      <div>{{row}}</div>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endif %}
+          {% endfor %}
+          <table class="table" id="myTable">
+            <thead>
+              <tr><th></th></tr>
+            </thead>
+            <tbody>
+              {% for row in data %}
+                <tr>
+                  <td>
+                      <div class="col-lg-12">
+                        <ul class="list-group">
+                            <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                                <div class="d-flex flex-column">
+                                    <h6 class="mb-3 text-sm">{{row.book.judul}}</h6>
+                                    <span class="mb-2 text-xs">No Registrasi: <span class="text-dark font-weight-bold ms-sm-2">{{ row.no }}</span></span>
+                                    <span class="mb-2 text-xs">Penulis: <span class="text-dark ms-sm-2 font-weight-bold">{{row.book.penulis_buku}}</span></span>
+                                    <span class="text-xs">Penerbit: <span class="text-dark ms-sm-2 font-weight-bold">{{row.book.penerbit_buku}}</span></span>
+                                    <span class="text-xs">Status: <span class="badge mt-1 ms-sm-2 font-weight-bold badge-sm bg-gradient-success">Registerd</span></span>
+                                </div>
+                                <div class="ms-auto text-end">
+                                    <a class="btn btn-link text-primary text-gradient px-3 mb-0 print_barcode" href="{{ row.barcode.url }}" download=""><i class="fas fa-barcode me-2"></i>Barcode</a>
+                                    <a class="btn btn-link text-danger text-gradient px-3 mb-0 show_delete_book" href="{% url 'post.destroy' row.id %}"><i class="far fa-trash-alt me-2"></i>Delete</a>
+                                    <a class="btn btn-link text-dark px-3 mb-0" href="{% url 'post.update' row.book.id %}"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
+                                </div>
+                            </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+<!-- {% url 'post.destroy' row.id %} -->
+{% block modal %}
+<div class="modal fade" id="tambahBuku" tabindex="-1" aria-labelledby="tambahBukuLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tambahBukuLabel">Tambah Buku</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'post.book' %}" method="post" enctype="multipart/form-data" novalidate="">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                {{form_book.as_p}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary show_confirm">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="regBook" tabindex="-1" aria-labelledby="regBookLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="regBookLabel">Registrasi Buku</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'post.reg' %}" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="">No Registarsi</label>
+                <input type="number" class="form-control" name="no" required>
+                <!-- <div class="ml-2 my-2 text-danger text-xxs">
+                  No Registrasi Harus Berjumlah 12 Nomer Acak
+                </div> -->
+            </div>
+            <div class="form-group mb-3">
+                <label for="">Buku Yang Ingin Di Registarsi</label>
+                {{form_reg.book}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary show_confirm_reg">Registrasi</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock modal %}
+
+{% block scripts %}
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+        $('#dll').DataTable();
+    });
+
+    // $('.show_confirm').click(function(event) {
+    //     var form =  $(this).closest("form");
+    //     Swal.fire(
+    //         'Berhasil menambahkan buku',
+    //         'Silahkan registrasikan buku agar bisa di pinjam user!',
+    //         'success'
+    //     )
+    // });
+
+    // $('.show_confirm_reg').click(function(event) {
+    //     var form =  $(this).closest("form");
+    //     Swal.fire(
+    //         'Berhasil meregistrasikan buku',
+    //         'Silahkan cek apakah sudah masuk!',
+    //         'success'
+    //     )
+    // });
+
+    $('.show_delete_book').click(function(event) {
+      Swal.fire(
+          'Berhasil menghapus buku',
+          'Buku yang terhapus tidak bisa di kembalikan!',
+          'success'
+      )
+    });
+
+    $('.print_barcode').click(function(event) {
+      Swal.fire(
+          'Berhasil mengunduh Barcode',
+          'Barcode Buku!',
+          'success'
+      )
+    });
+</script>
+{% endblock scripts %}

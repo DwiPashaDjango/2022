@@ -1,0 +1,39 @@
+{% extends 'layouts/petugas.html' %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <a href="#" class="btn btn-succeess back"><i class="fas fa-arrow-left"></i></a>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'post.update' data.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                {{form.as_p}}
+            </div>
+            <hr>
+            <div class="btn-footer" style="float: right;">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary update">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $('.back').click(function(event) {
+        window.history.back()
+    });
+
+    $('.update').click(function(event) {
+        var form =  $(this).closest("form");
+        Swal.fire(
+            'Berhasil update buku',
+            'Congratulations!',
+            'success'
+        )
+    });
+</script>
+{% endblock scripts %}
